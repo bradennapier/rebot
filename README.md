@@ -10,6 +10,8 @@ This is an early-phase experiment in building a native React Fiber Reconciler wi
 
 ## Example
 
+The example below is a bit of a "kitchen sink" test showing and testing the re-render capabilities using the standard React API.
+
 ![image](https://user-images.githubusercontent.com/15365418/54894830-d995e700-4e79-11e9-9508-82890d6eac21.png)
 
 ```javascript
