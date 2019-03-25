@@ -3,5 +3,9 @@ import * as React from 'react';
 import { Props } from '../../index';
 
 export function Blocks({ children }) {
-  return <Props as="blocks">{children.filter(Boolean)}</Props>;
+  const finalChildren = children.filter(Boolean);
+  if (finalChildren.length === 0) {
+    return;
+  }
+  return <Props as="blocks">{finalChildren}</Props>;
 }

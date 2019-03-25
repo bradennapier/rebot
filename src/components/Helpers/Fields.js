@@ -3,5 +3,9 @@ import * as React from 'react';
 import { Props } from '../../index';
 
 export function Fields({ children }) {
-  return <Props as="fields">{children}</Props>;
+  const finalChildren = children.filter(Boolean);
+  if (finalChildren.length === 0) {
+    return;
+  }
+  return <Props as="fields">{finalChildren}</Props>;
 }
