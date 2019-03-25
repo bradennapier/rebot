@@ -142,7 +142,7 @@ function MyMessage() {
           <Select
             actionID="channel_select"
             placeholder="Select a Channel"
-            conversations
+            channels
           />
         </Actions>
       </Blocks>
