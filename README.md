@@ -1,63 +1,157 @@
 # rebot
 
+This is an early-phase experiment in building a native React Fiber Reconciler with the Slack API as an endpoint. At this point is only using REST and not WebSocket to create and update messages as their state changes. Much more can be done (such as directly adding `onClick` to `<Button />`, etc) once the WS API is used as well.
+
+> **Note:** While most features should work at this point, there are some pieces of the reconciler which are not setup such as the newest Suspense/Lazy capabilities.
+
+> **Note:** In my internal version I have `attachments` and `dialogs` working, but I will need to refactor this before making it public as it is tied into the project this is used within still.
+
+> **Note:** This is not yet published to `npm` and must be tested directly by cloning the repo and running the example.
+
+## Example
+
 ```javascript
-// retained in case needed
-appendChild(parentInstance, child) {
-    console.log('! append Child !');
-    if (parentInstance.appendChild) {
-      parentInstance.appendChild(child);
-    } else {
-      parentInstance.document = child;
-    }
-  },
+import * as React from 'react';
 
-  removeChild(parentInstance, child) {
-    console.log('! removeChild ! ', parentInstance, child);
-    parentInstance.removeChild(child);
-  },
+import {
+  render,
+  Message,
+  TextBlock,
+  Blocks,
+  Section,
+  Fields,
+  Accessory,
+  Button,
+  TextField,
+  Divider,
+  Image,
+  Actions,
+  Select,
+} from './src';
 
-  insertBefore(parentInstance, child, beforeChild) {
-    console.log('! insertBefore ! ');
-    // noob
-  },
+import createAxiosEngine from './src/engines/slack-axios';
 
-  insertInContainerBefore(...args) {
-    console.log('! insert in container before !');
-  },
+class StatefulText extends React.Component {
+  state = {
+    url: 'https://www.google.com',
+    name: 'Google',
+    list: ['One', 'Two', 'Three'],
+  };
 
-  removeChildFromContainer(parentInstance, child) {
-    console.log('! remove Child From Container ! ');
-    parentInstance.removeChild(child);
-  },
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({
+        url: 'https://www.bing.com',
+        name: 'Bing',
+        list: ['Zero', ...this.state.list, 'Four'],
+      });
+    }, 3000);
+  }
 
-  commitUpdate(instance, updatePayload, type, oldProps, newProps) {
-    console.log('! commitUpdate !');
-    // noop
-  },
+  render() {
+    const { url, name, list } = this.state;
+    return (
+      <Section>
+        <TextBlock>
+          Welcome to <strong>React Slack Renderer!</strong> <br />
+          You can visit <a href={url}>{name}</a> if you want
+          <ul>
+            {list.map(el => (
+              <li key={el}>{el}</li>
+            ))}
+          </ul>
+        </TextBlock>
+      </Section>
+    );
+  }
+}
 
-  commitMount(instance, updatePayload, type, oldProps, newProps) {
-    console.log('! commitMount 1');
-    // noop
-  },
+class StatefulButtonText extends React.Component {
+  state = {
+    text: (
+      <span>
+        <b>Do you want</b> to do this?
+      </span>
+    ),
+  };
 
-  commitTextUpdate(textInstance, oldText, newText) {
-    console.log('! commitTextUpdate !');
-    textInstance.children = newText;
-  },
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({
+        text: 'Do you want to?',
+      });
+    }, 3000);
+  }
 
-  hideInstance(...args) {
-    console.log('! hide instance ! ', args);
-  },
+  render() {
+    return this.state.text;
+  }
+}
 
-  hideTextInstance(...args) {
-    console.log('! hide text instance ! ', args);
-  },
+function MySection() {
+  return (
+    <Section blockID="Test">
+      <TextBlock>Some Text in the section!</TextBlock>
+      <Accessory>
+        <Button
+          actionID="section_button"
+          confirm={{
+            title: 'Are You Sure?',
+            text: <StatefulButtonText />,
+            confirm: 'Yes!',
+            deny: 'No!',
+          }}
+        >
+          My Button
+        </Button>
+      </Accessory>
+      <Fields>
+        <TextField>
+          <b>Title</b>
+          <br />
+          One
+        </TextField>
+        <TextField>
+          <b>Title</b>
+          <br />
+          Two
+        </TextField>
+      </Fields>
+    </Section>
+  );
+}
 
-  unhideInstance(...args) {
-    console.log('! unhide instance ! ', args);
-  },
+function MyMessage() {
+  return (
+    <Message channel="monitoring">
+      <Blocks>
+        <Divider />
+        <StatefulText />
+        <Divider />
+        <Image
+          title="Cutie!"
+          alt="Little Kitten"
+          url="http://placekitten.com/500/500"
+        />
+        <Divider />
+        <MySection />
+        <Divider />
+        <Actions>
+          <Select
+            actionID="channel_select"
+            placeholder="Select a Channel"
+            conversations
+          />
+        </Actions>
+      </Blocks>
+    </Message>
+  );
+}
 
-  unhideTextInstance(...args) {
-    console.log('! unhide text instance !', args);
-  },
+render(<MyMessage example />, {
+  id: 'my-renderer-id',
+  engine: createAxiosEngine({
+    oauth_token: '<token>',
+  }),
+});
 ```
