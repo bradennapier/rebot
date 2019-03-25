@@ -98,26 +98,26 @@ class StatefulMessage extends React.Component {
   }
 }
 
-function MyMessage() {
-  const props = {
-    tx: '0x822846e2d067847656f6ac3ea701fe1a1917c50053dd426ab793c1decaa910b5',
-  };
+function MyMessage({ tx }) {
   return (
     <Message channel="monitoring">
       <Blocks>
         <StatefulMessage />
         <Divider />
-        <EtherscanLink tx={props.tx} />
-        <TransactionStatus tx={props.tx} />
+        <EtherscanLink tx={tx} />
+        <TransactionStatus tx={tx} />
         <Divider />
       </Blocks>
     </Message>
   );
 }
 
-render(<MyMessage example />, {
-  id: 'my-renderer-id',
-  engine: createAxiosEngine({
-    oauth_token: '<token>',
-  }),
-});
+render(
+  <MyMessage tx="0x822846e2d067847656f6ac3ea701fe1a1917c50053dd426ab793c1decaa910b5" />,
+  {
+    id: 'my-renderer-id',
+    engine: createAxiosEngine({
+      oauth_token: '<token>',
+    }),
+  },
+);
