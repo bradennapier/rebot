@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import {
   render,
   Message,
@@ -6,129 +7,109 @@ import {
   Blocks,
   Section,
   Fields,
-  Accessory,
-  Button,
   TextField,
   Divider,
-  Image,
-  Actions,
-  Select,
 } from './src';
 
 import createAxiosEngine from './src/engines/slack-axios';
 
-class StatefulText extends React.Component {
+function EtherscanLink({ tx }) {
+  return (
+    <Section>
+      <TextBlock>
+        <b>Transaction</b>
+        <br />
+        <a href={`https://www.etherscan.io/tx/${tx}`}>{tx}</a>
+      </TextBlock>
+    </Section>
+  );
+}
+class TransactionStatus extends React.Component {
   state = {
-    url: 'https://www.google.com',
-    name: 'Google',
-    list: ['One', 'Two', 'Three'],
+    confirmations: 28,
+    needed: 30,
   };
 
+  timerID = undefined;
+
   componentDidMount() {
-    setTimeout(() => {
-      this.setState({
-        url: 'https://www.bing.com',
-        name: 'Bing',
-        list: ['Zero', ...this.state.list, 'Four'],
-      });
-    }, 3000);
+    if (this.state.confirmations < this.state.needed) {
+      this.timerID = setInterval(() => {
+        this.setState({
+          confirmations: this.state.confirmations + 1,
+        });
+      }, 3000);
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
   }
 
   render() {
-    const { url, name, list } = this.state;
+    const { confirmations } = this.state;
+    const status =
+      this.state.confirmations === this.state.needed ? 'Confirmed' : 'Pending';
+    if (status === 'Confirmed') {
+      clearInterval(this.timerID);
+    }
     return (
       <Section>
-        <TextBlock>
-          Welcome to <strong>React Slack Renderer!</strong> <br />
-          You can visit <a href={url}>{name}</a> if you want
-          <ul>
-            {list.map(el => (
-              <li key={el}>{el}</li>
-            ))}
-          </ul>
-        </TextBlock>
+        <Fields>
+          <TextField>
+            <span>
+              <b>Status</b>
+              <br />
+              {status}
+            </span>
+          </TextField>
+          <TextField>
+            <span>
+              <b>Confirmations</b>
+              <br />
+              {confirmations} / 30
+            </span>
+          </TextField>
+        </Fields>
       </Section>
     );
   }
 }
 
-class StatefulButtonText extends React.Component {
+class StatefulMessage extends React.Component {
   state = {
-    text: (
-      <span>
-        <b>Do you want</b> to do this?
-      </span>
-    ),
+    text: 'The Transaction is processing.',
   };
 
   componentDidMount() {
     setTimeout(() => {
       this.setState({
-        text: 'Do you want to?',
+        text: 'Changed',
       });
     }, 3000);
   }
 
   render() {
-    return this.state.text;
+    return (
+      <Section>
+        <TextBlock>{this.state.text}</TextBlock>
+      </Section>
+    );
   }
 }
 
-function MySection() {
-  return (
-    <Section blockID="Test">
-      <TextBlock>Some Text in the section!</TextBlock>
-      <Accessory>
-        <Button
-          actionID="section_button"
-          confirm={{
-            title: 'Are You Sure?',
-            text: <StatefulButtonText />,
-            confirm: 'Yes!',
-            deny: 'No!',
-          }}
-        >
-          My Button
-        </Button>
-      </Accessory>
-      <Fields>
-        <TextField>
-          <b>Title</b>
-          <br />
-          One
-        </TextField>
-        <TextField>
-          <b>Title</b>
-          <br />
-          Two
-        </TextField>
-      </Fields>
-    </Section>
-  );
-}
-
 function MyMessage() {
+  const props = {
+    tx: '0x822846e2d067847656f6ac3ea701fe1a1917c50053dd426ab793c1decaa910b5',
+  };
   return (
     <Message channel="monitoring">
       <Blocks>
+        <StatefulMessage />
         <Divider />
-        <StatefulText />
+        <EtherscanLink tx={props.tx} />
+        <TransactionStatus tx={props.tx} />
         <Divider />
-        <Image
-          title="Cutie!"
-          alt="Little Kitten"
-          url="http://placekitten.com/500/500"
-        />
-        <Divider />
-        <MySection />
-        <Divider />
-        <Actions>
-          <Select
-            actionID="channel_select"
-            placeholder="Select a Channel"
-            channels
-          />
-        </Actions>
       </Blocks>
     </Message>
   );
@@ -140,4 +121,3 @@ render(<MyMessage example />, {
     oauth_token: '<token>',
   }),
 });
-//

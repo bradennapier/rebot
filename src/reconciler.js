@@ -14,7 +14,7 @@ let PARENT = null;
 export default Reconciler({
   now: Date.now,
   supportsMutation: true,
-  isPrimaryRenderer: true,
+  // isPrimaryRenderer: true,
 
   appendInitialChild(parent, child) {
     if (parent.appendChild) {
@@ -72,7 +72,7 @@ export default Reconciler({
       (typeof props.children === 'string' || typeof props.children === 'number')
     ) {
       // TODO - put time into finding why this needs to be false atm
-      return false;
+      return true;
     }
     return false;
   },
@@ -80,6 +80,7 @@ export default Reconciler({
   shouldDeprioritizeSubtree(...args) {},
 
   appendChild(parentInstance, child) {
+    // console.log('appendChild: ', child);
     if (parentInstance.appendChild) {
       parentInstance.appendChild(child);
     } else {
@@ -104,21 +105,32 @@ export default Reconciler({
   },
 
   commitUpdate(instance, updatePayload, type, oldProps, newProps) {
+    // console.log('COMMIT UPDATE: ', {
+    //   instance,
+    //   updatePayload,
+    //   type,
+    //   oldProps,
+    //   newProps,
+    // });
     if (typeof instance === 'object') {
-      if (instance.updateProps) {
-        instance.updateProps(newProps);
-        return;
-      }
       if (instance.value && Elements[type]) {
         instance.value = Elements[type](newProps, type, ROOT_INSTANCE).value;
+        return;
+      }
+
+      if (instance.updateProps) {
+        instance.updateProps(newProps);
       }
     }
     // noop
   },
 
-  commitMount(instance, updatePayload, props, oldProps, newProps) {},
+  commitMount(instance, updatePayload, props, oldProps, newProps) {
+    // console.log('commit mount!!! ', newProps);
+  },
 
   commitTextUpdate(textInstance, oldText, newText, ...args) {
+    // console.log('text update: ', newText, textInstance);
     return newText;
   },
 

@@ -33,6 +33,7 @@ async function handleRender(_block = {}) {
   }
   return block;
 }
+
 export class Text extends Root {
   async render() {
     const block = await handleRender.call(this);

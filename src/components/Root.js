@@ -20,6 +20,11 @@ export default class Root {
     this.children.push(child);
   }
 
+  async updateProps(nextProps) {
+    // console.log('UPDATE PROPS ', this.children[0].render);
+    this.props = nextProps;
+  }
+
   removeChild(child, ...args) {
     // console.log('Remove Child: ', child, args);
     const index = this.children.indexOf(child);
@@ -30,7 +35,6 @@ export default class Root {
   }
 
   async renderChildren() {
-    // console.log('Render Children: ', this.children);
     const rendered = [];
     for (let i = 0; i < this.children.length; i += 1) {
       const child = this.children[i];

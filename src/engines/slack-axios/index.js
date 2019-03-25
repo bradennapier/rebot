@@ -54,6 +54,7 @@ export default function slackAxiosEngine(config) {
       return request(requester, 'chat.postMessage', message);
     },
     updateMessage(message: Bot$Message) {
+      // console.log('UPDATE: ', message);
       return request(requester, 'chat.update', message);
     },
     deleteMessage(message: Bot$Message) {

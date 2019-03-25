@@ -3,37 +3,49 @@ function Element(wrapper) {
 }
 
 function Wrapper(wrapper) {
-  const children = [];
-  return props => ({
-    get children() {
-      return props.children;
-    },
+  return initialProps => {
+    let children = [];
+    let props = initialProps;
+    return {
+      get children() {
+        return children;
+      },
 
-    insertBefore(child, newChild) {
-      const indexOf = children.indexOf(child);
-      children.splice(indexOf, 0, newChild);
-    },
-    appendChild(child, ...args) {
-      children.push(child);
-    },
-    updateProps(nextProps) {
-      props = nextProps;
-    },
+      insertBefore(child, newChild) {
+        const indexOf = children.indexOf(child);
+        children.splice(indexOf, 0, newChild);
+      },
+      appendChild(child, ...args) {
+        children.push(child);
+      },
+      updateProps(nextProps) {
+        props = nextProps;
+        children = nextProps.children;
 
-    removeChild(child, ...args) {
-      const index = children.indexOf(child);
-      children.splice(index, 1);
-    },
+        // console.log('updated props: ', nextProps.children);
+      },
 
-    render() {
-      return wrapper.render(
-        children.map(child =>
-          typeof child === 'object' ? child.value : child,
-        ),
-        props,
-      );
-    },
-  });
+      removeChild(child, ...args) {
+        const index = children.indexOf(child);
+        children.splice(index, 1);
+      },
+
+      render() {
+        const result = wrapper.render(
+          children.map((child, idx) => {
+            if (typeof child === 'object' && Elements[child.type]) {
+              const result = Elements[child.type](child.props);
+              return result.value;
+            }
+            return typeof child === 'object' ? child.value : child;
+          }),
+          props,
+        );
+
+        return result;
+      },
+    };
+  };
 }
 
 export const Elements = {

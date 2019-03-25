@@ -19,6 +19,7 @@ export class Message extends Root {
 
     const nextMessage = JSON.stringify(message);
 
+    // console.log(JSON.stringify(message, null, 2));
     if (!state.prevMessage) {
       state.prevMessage = nextMessage;
       const result = await config.engine.sendMessage(nextMessage);
