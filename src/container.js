@@ -1,5 +1,4 @@
 export default function Root(rootElement, config) {
-  // console.log('[Root] | Creating Root Container');
   const children = [];
 
   return {
@@ -7,14 +6,12 @@ export default function Root(rootElement, config) {
       return children;
     },
     async appendChild(child) {
-      // console.log('!!Append Child: ', child, args);
       children.push(child);
     },
     insertBefore(child, newChild) {
       children.splice(children.indexOf(child), 0, newChild);
     },
     removeChild(child) {
-      // console.log('!!Remove Child: ', child, args);
       children.splice(children.indexOf(child), 1);
     },
 

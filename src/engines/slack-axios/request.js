@@ -85,7 +85,7 @@ export function getRequest(requester, method: string, params: Object) {
     baseURL: 'https://slack.com/api',
     params,
     headers: {
-      'User-Agent': 'idex-slackbot',
+      'User-Agent': 'rebot',
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   })
@@ -99,7 +99,7 @@ export function customRequest(requester, method: string, settings: Object) {
     baseURL: 'https://slack.com/api',
     ...settings,
     headers: {
-      'User-Agent': 'idex-slackbot',
+      'User-Agent': 'rebot',
       'Content-Type': 'application/x-www-form-urlencoded',
       ...settings.headers,
     },

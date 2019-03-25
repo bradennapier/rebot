@@ -14,7 +14,6 @@ function Wrapper(wrapper) {
       children.splice(indexOf, 0, newChild);
     },
     appendChild(child, ...args) {
-      // console.log('Append Child Wrapper', { child, args });
       children.push(child);
     },
     updateProps(nextProps) {
@@ -22,13 +21,11 @@ function Wrapper(wrapper) {
     },
 
     removeChild(child, ...args) {
-      // console.log('Remove Child Wrapper ', { child, args });
       const index = children.indexOf(child);
       children.splice(index, 1);
     },
 
     render() {
-      // console.log('Render Wrapper! ', children, props);
       return wrapper.render(
         children.map(child =>
           typeof child === 'object' ? child.value : child,
@@ -49,11 +46,6 @@ export const Elements = {
   blockquote: Element(child => ({ value: `> ${child}` })),
   code: Element(child => ({ value: `\`\`\`${child}\`\`\`` })),
   li: Element(child => ({ value: `- ${child}` })),
-  // a: Wrapper({
-  //   render(children, props) {
-  //     return `<${props.href}|${children}>`;
-  //   },
-  // }),
   a: Element((child, props) => ({
     value: `<${props.href}|${child}>`,
   })),
